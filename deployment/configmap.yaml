@@ -5,5 +5,5 @@ metadata:
   namespace: scw-exp01-initcont
 data:
   MYDATA_SOURCE_DIR: "static"
-  MYTEMPLATE_SOURCE_DIR: "templates"
+  MYTEMPLATE_SOURCE_DIR: "templates2"
 
