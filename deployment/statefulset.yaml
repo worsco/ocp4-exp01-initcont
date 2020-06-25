@@ -5,7 +5,7 @@ metadata:
   namespace: scw-exp01-initcont
 spec:
   serviceName: pythonflask
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: pythonflask
@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: pythonflask
+      annotations:
+        rollme: "1"
     spec:
       initContainers:
         - name: initpv
@@ -24,6 +26,17 @@ spec:
       containers:
         - name: pythonflask
           image: 'quay.io/worsco/ocp4-exp01-web:latest'
+          env:
+            - name: MYDATA_SOURCE_DIR
+              valueFrom:
+                configMapKeyRef:
+                  name: ocp4-exp01-web
+                  key: MYDATA_SOURCE_DIR
+            - name: MYTEMPLATE_SOURCE_DIR
+              valueFrom:
+                configMapKeyRef:
+                  name: ocp4-exp01-web
+                  key: MYTEMPLATE_SOURCE_DIR
           ports:
             - containerPort: 8080
               name: web
