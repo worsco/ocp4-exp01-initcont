@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pythonflask
+  namespace: scw-exp01-initcont
+spec:
+  serviceName: pythonflask
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pythonflask
+  template:
+    metadata:
+      labels:
+        app: pythonflask
+    spec:
+      initContainers:
+        - name: initpv
+          image: 'quay.io/worsco/ocp4-exp01-initcont:latest'
+          volumeMounts:
+            - name: www
+              mountPath: /usr/share/html
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: pythonflask
+          image: 'quay.io/worsco/ocp4-exp01-web:latest'
+          ports:
+            - containerPort: 8080
+              name: web
+          volumeMounts:
+            - name: www
+              mountPath: /usr/share/html
+  volumeClaimTemplates:
+    - metadata:
+        name: www
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: gp2
+        resources:
+          requests:
+            storage: 1Gi
