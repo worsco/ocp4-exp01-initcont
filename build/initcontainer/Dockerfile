@@ -1,4 +1,4 @@
-FROM python:3-alpine
+FROM registry.redhat.io/rhscl/python-36-rhel7:1-66
 
 WORKDIR /app
 COPY . /app
