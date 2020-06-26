@@ -7,7 +7,7 @@ if [[ -z "$S3BUCKET" || ! "$S3BUCKET" == "true" ]] ; then
 fi
 
 if [[ "$S3BUCKET" == "true" ]]; then
-  aws s3 sync s3://scw-initcont-exp01/exp01-annoydata/ /usr/share/html/
+  aws s3 sync --no-progress s3://scw-initcont-exp01/exp01-annoydata/ /usr/share/html/
   exit 0
 fi
 
