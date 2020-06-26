@@ -19,6 +19,27 @@ spec:
       initContainers:
         - name: initpv
           image: 'quay.io/worsco/ocp4-exp01-initcont:latest'
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: initcont-aws-ro
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: initcont-aws-ro
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: initcont-aws-ro
+                  key: AWS_DEFAULT_REGION
+            - name: S3BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: ocp4-exp01-initcont
+                  key: S3BUCKET
           volumeMounts:
             - name: www
               mountPath: /usr/share/html
