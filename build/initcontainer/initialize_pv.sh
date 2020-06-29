@@ -22,7 +22,4 @@ if [[ -z "$AWS_DEFAULT_REGION" ]]; then
   exit 1
 fi
   aws s3 sync --no-progress s3://scw-initcont-exp01/exp01-annoydata/ /usr/share/html/
-  exit 0
 fi
-
-# if we got here, maybe we should "exit 1"
