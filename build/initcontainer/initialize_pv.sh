@@ -22,4 +22,9 @@ if [[ -z "$AWS_DEFAULT_REGION" ]]; then
   exit 1
 fi
   aws s3 sync --no-progress s3://scw-initcont-exp01/exp01-annoydata/ /usr/share/html/
+  exit $?
 fi
+
+# If you got to here, there is an unknown error
+echo "ERROR: 'aws s3 sync' unknown error."
+exit 1
