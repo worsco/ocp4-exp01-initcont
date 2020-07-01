@@ -35,10 +35,12 @@ CHANGE-ME
   * IAM User
     * Read Only to S3 Bucket
       * Inline Policy
-* Container Image Repository
+* Container Image Repositories
   * Quay.io
-    * Account
+    * An account
     * Two image repositories
+  * registry.redhat.io
+    * An account
 * OpenShift 4 cluster
   * Persistent Volume capability
     * RWO
@@ -47,21 +49,168 @@ CHANGE-ME
 
 ### Create S3 Bucket
 
-CHANGE-ME
+* Create an S3 bucket in AWS.  Ensure it is not accessible by the public.  We will be using a policy attached
+to a IAM role to allow connectivity.
+
+The name of the bucket will be used in the next section.
+
+* Create a folder using the AWS S3 console interface and note its name (that name will be used in the security
+ policy in the next section).
 
 ### Create AWS IAM Users and attach policy
 
-CHANGE-ME
+* Create two AWS IAM Users.
+
+In my demo, I have created `ocp-exp01-initcont-push` (that will have R/W access to the S3 bucket + one folder), and a
+account named `ocp-exp01-initcont-ro` (which will have read-only access to a specific folder in the bucket).
+
+When you create each account, note the KEY ID and the SECRET -- they will be used later.
+
+#### s3-readwrite-exp01
+
+To the `ocp-exp01-initcont-push` IAM user, alter the following policy and attach it.
+Replace "YOUR-S3-BUCKET-NAME" with the bucket that you've created and "YOUR-FOLDER" with the folder 
+that you previously created in the S3 bucket.  This will limit the "push" account to only
+one folder in the S3 bucket.
+
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowListBucketIfSpecificPrefixIsIncludedInRequest",
+            "Action": [
+                "s3:ListBucket"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::YOUR-S3-BUCKET-NAME"
+            ],
+            "Condition": {
+                "StringLike": {
+                    "s3:prefix": [
+                        "YOUR-FOLDER/*"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "AllowUserToReadWriteObjectDataInDevelopmentFolder",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::YOUR-S3-BUCKET-NAME/YOUR-FOLDER/*"
+            ]
+        }
+    ]
+}
+```
+
+#### s3-readonly-exp01
+
+To the `ocp-exp01-initcont-ro`, alter the following policy and attach it to the "read-only" IAM account.
+Like the previous section, replace "YOUR-S3-BUCKET-NAME" with the bucket that you have created and 
+"YOUR-FOLDER" with the folder name.
+
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowListBucketIfSpecificPrefixIsIncludedInRequest",
+            "Action": [
+                "s3:ListBucket"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::YOUR-S3-BUCKET-NAME"
+            ],
+            "Condition": {
+                "StringLike": {
+                    "s3:prefix": [
+                        "YOUR-FOLDER/*"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "AllowUserToReadWriteObjectDataInDevelopmentFolder",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::YOUR-S3-BUCKET-NAME/YOUR-FOLDER/*"
+            ]
+        }
+    ]
+}
+```
 
 ### Push images into S3 bucket
 
-CHANGE-ME
+In our demonstration, you need to download two images and name them
+`hyttioaoa.png` and `space_cat.png`.  The `hyttioaoa.png` image can be found
+in the `build/webcontainer/static/` directory.  The `space_cat.png` file
+should be a new file and fairly large -- I would suggest you locate a very 
+large image file from NASA and use that as your `space_cat.png` file to upload
+into S3.
+
+Set your AWS Credential environment variables and push two images into the S3 folder.
+
+```bash
+export AWS_ACCESS_KEY_ID=YOUR-RW-ACCOUNT-ID
+export AWS_SECRET_ACCESS_KEY=YOUR-RW-ACCOUNT-SECRET
+export AWS_DEFAULT_REGION=YOUR-AWS-S3-REGION
+export S3BUCKETNET=YOUR-S3-BUCKET-NAME
+export S3FOLDER=YOUR-S3-FOLDER
+```
+
+Change directory into your local folder that has your `hyttioaoa.png` and
+`space_cat.png` files (reminder -- don't use the `space_cat.png` from this
+repo, find a new, large png file).  The `space_cat.png` uploaded to S3 will
+be used to demonstrate 1. large file sync using an initContainer in k8s and
+2. displaying a file from a web page using a python flask web server.
+
+```bash
+aws s3 sync . s3://YOUR-S3-BUCKET/YOUR-FOLDER
+```
 
 ### Create Quay.io repositories
 
-CHANGE-ME
+Two images will be used in this demonstration and we need to have a public repositories to pull our
+custom images.  
+
+* Create a free account in quay.io
+  * Make note of that account name and your access credentials
+* Create two public repositories
+  * `ocp4-exp01-initcont`
+  * `ocp4-exp01-web`
+
 
 ### Build and Push container images
+
+* Log into `quay.io` from command line
+  * To push images into
+* Log into `registry.redhat.io`
+  * To pull base containers from
+
+#### quay.io
+
+```bash
+podman login -u "your-quay.io-username" -p
+```
+
+#### registry.redhat.io
+
+```bash
+podman login -u "your-redhat-io-username" -p
+```
 
 CHANGE-ME
 
