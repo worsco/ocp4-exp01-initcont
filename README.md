@@ -132,7 +132,7 @@ oc patch configmap ocp4-exp01-web \
 --patch '{"data":{"MYTEMPLATE_SOURCE_DIR":"templates2"}}'
 ```
 
-Force `statefullset` to redeploy
+Force `statefullset` to redeploy by relying on the "nano-second" output of the date command and patching the `rollme` annotation on the `statefulset`.
 
 ```bash
 ROLLME=`date +%N` ; echo $ROLLME ; \ \
@@ -177,13 +177,10 @@ oc patch configmap ocp4-exp01-web \
 --patch '{"data":{"MYDATA_SOURCE_DIR":"/usr/share/html"}}'
 ```
 
-Force `statefullset` to redeploy
+Force `statefullset` to redeploy... use the script provided
 
 ```bash
-ROLLME=`date +%N`; echo $ROLLME ; \
-oc patch sts pythonflask \
--n $INITCONTPROJECT \
---patch "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"rollme\":\"$ROLLME\"}}}}}"
+scripts/roll_sts.sh
 ```
 
 Make sure the last rollout is complete (before reloading/deploying the browser) by checking that all pods are running
@@ -223,10 +220,7 @@ oc patch configmap ocp4-exp01-initcont \
 Force `statefullset` to redeploy
 
 ```bash
-ROLLME=`date +%N` ; echo $ROLLME ; \
-oc patch sts pythonflask \
--n $INITCONTPROJECT \
---patch "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"rollme\":\"$ROLLME\"}}}}}"
+scripts/roll_sts.sh
 ```
 
 Reload the image -- I found that I needed to view the web page in a new browser or an incognito session as
@@ -253,10 +247,7 @@ oc patch configmap ocp4-exp01-initcont \
 Force `statefullset` to redeploy
 
 ```bash
-ROLLME=`date +%N` ; echo $ROLLME ; \
-oc patch sts pythonflask \
--n $INITCONTPROJECT \
---patch "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"rollme\":\"$ROLLME\"}}}}}"
+scripts/roll_sts.sh
 ```
 
 Because you changed the `S3BUCKET` variable to false, the initContainer will copy its images
