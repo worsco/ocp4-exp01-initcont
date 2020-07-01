@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: pythonflask
-  namespace: scw-exp01-initcont
 spec:
   serviceName: pythonflask
   replicas: 2
@@ -40,6 +39,16 @@ spec:
                 configMapKeyRef:
                   name: ocp4-exp01-initcont
                   key: S3BUCKET
+            - name: S3BUCKETNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: ocp4-exp01-initcont
+                  key: S3BUCKETNAME
+            - name: S3FOLDER
+              valueFrom:
+                configMapKeyRef:
+                  name: ocp4-exp01-initcont
+                  key: S3FOLDER
           volumeMounts:
             - name: www
               mountPath: /usr/share/html

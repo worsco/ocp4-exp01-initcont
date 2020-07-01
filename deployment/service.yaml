@@ -2,7 +2,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ocp4-exp01-web
-  namespace: scw-exp01-initcont
 spec:
   selector:
     app: pythonflask

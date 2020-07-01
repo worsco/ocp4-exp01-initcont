@@ -21,7 +21,12 @@ if [[ -z "$AWS_DEFAULT_REGION" ]]; then
   echo "AWS_DEFAULT_REGION env var needs to be set, aborting."
   exit 1
 fi
-  aws s3 sync --no-progress s3://scw-initcont-exp01/exp01-annoydata/ /usr/share/html/
+if [[ -z "$S3BUCKETNAME" ]]; then
+  echo "S3BUCKETNAME env var needs to be set, aborting."
+  exit 1
+fi
+
+  aws s3 sync --no-progress s3://$S3BUCKETNAME/$S3FOLDER/ /usr/share/html/
   exit $?
 fi
 
