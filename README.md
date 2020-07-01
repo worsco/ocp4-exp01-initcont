@@ -93,7 +93,7 @@ OUTPUT (an example)
 
 ```bash
 NAME             HOST/PORT                                                                           PATH   SERVICES         PORT   TERMINATION   WILDCARD
-ocp4-exp01-web   ocp4-exp01-web-ocp4-exp01-initcont.apps.cluster-0a62.0a62.sandbox1775.opentlc.com          ocp4-exp01-web   8080                 None
+ocp4-exp01-web   ocp4-exp01-web-ocp4-exp01-initcont.apps.cluster-0000.lab.domain.tld          ocp4-exp01-web   8080                 None
 ```
 
 Browse the route with a browser (example is using Firefox)
