@@ -17,7 +17,7 @@ in this experiment, is python flask web application.
 
 ### Architecture Diagram
 
-CHANGE-ME
+![Architcture Diagram](/diagrams/architecture.png "Architecture Diagram")
 
 ### Process Flow Diagram
 
