@@ -16,7 +16,6 @@ if [[ -z "$MYREGISTRYACCT" ]] ; then
 fi
 
 cd initcontainer && \
-buildah bud -t $MYINITCONT_REPO . && \
-podman tag localhost/$MYINITCONT_REPO $MYREGISTRY/$MYREGISTRYACCT/$MYINITCONT_REPO:latest && \
+buildah bud -t $MYREGISTRY/$MYREGISTRYACCT/$MYINITCONT_REPO:latest . && \
 podman push $MYREGISTRY/$MYREGISTRYACCT/$MYINITCONT_REPO:latest
 
