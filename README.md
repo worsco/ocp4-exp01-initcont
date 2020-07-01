@@ -21,7 +21,7 @@ CHANGE-ME
 
 ### Process Flow Diagram
 
-CHANGE-ME
+![Process Flow Diagram](/diagrams/flowchart.png "Process Flow Diagram")
 
 ## PRE-REQUISITES
 
