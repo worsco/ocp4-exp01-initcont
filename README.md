@@ -425,7 +425,9 @@ scripts/roll_sts.sh
 ```
 
 Reload the image -- I found that I needed to view the web page in a new browser or an incognito session as
-the browser cached the initial space_cat.png image without displaying the new, much larger image.
+the browser cached the initial space_cat.png image without displaying the new, much larger image.  Firefox
+was more consistent in not caching the image while Chrome gave me trouble (Ctrl+R would reload the page,
+but I would still see the 'cached' image, not the image that should be served by the flask server).
 
 * The browser 'should' display the much larger image
   
