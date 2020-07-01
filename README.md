@@ -64,8 +64,7 @@ The name of the bucket will be used in the next section.
 
 * Create two AWS IAM Users.
 
-In my demo, I have created `ocp-exp01-initcont-push` (that will have R/W access to the S3 bucket + one folder), and a
-account named `ocp-exp01-initcont-ro` (which will have read-only access to a specific folder in the bucket).
+The first account, `ocp-exp01-initcont-push`, has R/W access to the S3 bucket + one folder.  The second account,named `ocp-exp01-initcont-ro`, has read-only access to a specific folder in the bucket).
 
 When you create each account, note the KEY ID and the SECRET -- they will be used later.
 
