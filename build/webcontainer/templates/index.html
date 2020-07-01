@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lange="en">
 <body>
-<img src="{{ url_for('static', filename= 'hyttioaoa.png') }}" title="Have You Tried Turning It Off And On Again">
-<img src="{{ url_for('static', filename= 'does_not_exist.png') }}" title="Space Cat Does Not Exist">
 <h2>
 Image Source is "templates"
 </h2>
 <p>
 This page should display one working image and one broken image.
+</p>
+<p>
+<img src="{{ url_for('static', filename= 'hyttioaoa.png') }}" title="Have You Tried Turning It Off And On Again">
+<img src="{{ url_for('static', filename= 'does_not_exist.png') }}" title="Space Cat Does Not Exist">
 </p>
 </body>
 </html>

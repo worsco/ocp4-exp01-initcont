@@ -52,6 +52,22 @@ CHANGE-ME
 
 CHANGE-ME
 
+Set environment variables
+
+```bash 
+export MYREGISTRY=your-repo
+export MYREGISTRYACCT=your-account
+export MYINITCONT_REPO=ocp4-exp01-initcont
+export MYWEB_REPO=ocp4-exp01-web
+
+#### Build and Push initContainer container image
+
+CHANGE-ME
+
+#### Build and Push python flask container image
+
+CHANGE-ME
+
 ### Deploy application
 
 Set environment variables
