@@ -10,10 +10,11 @@ want to minimize transfer bandwidth & start-up time of our application pods on O
 
 ## Design
 
-A kubernete's statefulset, volumeClaimTemplate, and an initContainer will be used to fulfill our use-case.
-Two containers will be built -- the initContainer and an application container.  The initContainer has the 
+A statefulset, volumeClaimTemplate, and an initContainer will be used to fulfill our use-case.
+Two containers will be built -- an initContainer and the application container.  The initContainer has the 
 logic to connect to AWS S3 and will 'sync' the large binary files to the PV.  The application container,
-in this experiment, is python flask web application.
+in this experiment, is python flask web application.  Both containers will use the same base image
+from Red Hat: `registry.redhat.io/rhscl/python-36-rhel7`.
 
 ### Architecture Diagram
 
