@@ -1,18 +1,19 @@
 # ocp4-exp01-initcont
 
-OpenShift 4 "initContainer" experiment
+OpenShift 4 "initContainer" experiment to populate a PV
 
 ## Use-Case
 
 We need to be able to populate a Persistent Volume (PV) of type RWO with a large binary file from an S3
-bucket before the application starts.  The large binary file will only change every 30 days, and we
+bucket before our application starts.  The large binary file will only change every 30 days, and we
 want to minimize transfer bandwidth & start-up time of our application pods on OpenShift.
 
 ## Design
 
 A kubernete's statefulset, volumeClaimTemplate, and an initContainer will be used to fulfill our use-case.
-Two containers will be built -- the initContainer contains the logic to connect to AWS S3 and 'sync' the large
-binary files to the PV, and the application container -- in this experiment, it will be a python flask application.
+Two containers will be built -- the initContainer and an application container.  The initContainer has the 
+logic to connect to AWS S3 and will 'sync' the large binary files to the PV.  The application container,
+in this experiment, is python flask web application.
 
 ### Architecture Diagram
 
