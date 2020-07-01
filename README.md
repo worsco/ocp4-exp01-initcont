@@ -57,6 +57,8 @@ The name of the bucket will be used in the next section.
 * Create a folder using the AWS S3 console interface and note its name (that name will be used in the security
  policy in the next section).
 
+---
+
 ### Create AWS IAM Users and attach policy
 
 * Create two AWS IAM Users.
@@ -152,6 +154,8 @@ Like the previous section, replace "YOUR-S3-BUCKET-NAME" with the bucket that yo
 }
 ```
 
+---
+
 ### Push images into S3 bucket
 
 In our demonstration, you need to download two images and name them
@@ -181,6 +185,8 @@ be used to demonstrate 1. large file sync using an initContainer in k8s and
 aws s3 sync . s3://YOUR-S3-BUCKET/YOUR-FOLDER
 ```
 
+---
+
 ### Create Quay.io repositories
 
 Two images will be used in this demonstration and we need to have a public repositories to pull our
@@ -192,6 +198,7 @@ custom images.
   * `ocp4-exp01-initcont`
   * `ocp4-exp01-web`
 
+---
 
 ### Build and Push container images
 
@@ -212,46 +219,45 @@ podman login -u "your-quay.io-username" -p
 podman login -u "your-redhat-io-username" -p
 ```
 
-CHANGE-ME
+#### Set environment variables
 
-Set environment variables
+Change the following environment variables to match your registry account name.
 
 ```bash 
-export MYREGISTRY=your-repo
+export MYREGISTRY=quay.io
 export MYREGISTRYACCT=your-account
 export MYINITCONT_REPO=ocp4-exp01-initcont
 export MYWEB_REPO=ocp4-exp01-web
+````
 
 #### Build and Push initContainer container image
 
-CHANGE-ME
+```bash
+build/init_build_and_push.sh
+```
+
 
 #### Build and Push python flask container image
 
-CHANGE-ME
+```bash
+build/web_build_and_push.sh
+```
 
 ### Deploy application
 
-Set environment variables
+* Set environment variables for your OCP4 project name.
 
 ```bash
 export INITCONTPROJECT=ocp4-exp01-initcont
-
-export AWS_ACCESS_KEY_ID=your-key-id
-export AWS_SECRET_ACCESS_KEY=your-access-key
-export AWS_DEFAULT_REGION=your-aws-region
-
-export S3BUCKETNAME=your-bucket-name
-export S3FOLDER=your-s3-folder-name
 ```
 
-Create a new project
+* Create a new project
 
 ```bash
 oc new-project $INITCONTPROJECT
 ```
 
-Create deployment
+* Deploy the application
 
 ```bash
 deployment/create_secret.sh
@@ -261,12 +267,11 @@ oc apply -n $INITCONTPROJECT -f deployment/route.yaml
 oc apply -n $INITCONTPROJECT -f deployment/statefulset.yaml
 ```
 
-Get the route
+* Display the route
 
 ```bash
 oc get route ocp4-exp01-web
 ```
-
 OUTPUT (an example)
 
 ```bash
@@ -274,7 +279,13 @@ NAME             HOST/PORT                                                      
 ocp4-exp01-web   ocp4-exp01-web-ocp4-exp01-initcont.apps.cluster-0000.lab.domain.tld          ocp4-exp01-web   8080                 None
 ```
 
-Browse the route with a browser (example is using Firefox)
+* To display only the route path
+
+```bash
+echo "http://`oc get route ocp4-exp01-web -n $INITCONTPROJECT -o jsonpath='{.spec.host}'`"
+```
+
+* Browse the route with a browser (example is using Firefox)
 
 ```bash
 export WEB_ADDR=http://$(oc get route ocp4-exp01-web -n $INITCONTPROJECT -o jsonpath='{.spec.host}')
@@ -284,25 +295,37 @@ firefox --private-window $WEB_ADDR &
 
 The web page will have one image that works, the other is broken (because the file does not exist).
 
+---
+
 ### Begin experiment/demonstration of switching web templates and static image sources
 
 Possible combinations of settings for python flask for this experiment:
 
 ```bash
-#######################################################################
+MYDATA_SOURCE_DIR: static
+MYDATA_SOURCE_DIR: /usr/share/html
 
-# MYDATA_SOURCE_DIR: static
-# MYDATA_SOURCE_DIR: /usr/share/html
-
-# MYTEMPLATE_SOURCE_DIR: templates
-# MYTEMPLATE_SOURCE_DIR: templates2
-
-#######################################################################
+MYTEMPLATE_SOURCE_DIR: templates
+MYTEMPLATE_SOURCE_DIR: templates2
 ```
+
+* `MYDATA_SOURCE_DIR`:
+    * Setting it to `static` tells python flask to pull from the
+    directory `static` under the application's root directory
+    * Setting it to `/usr/share/html` give python flask a absolute
+    directory
+
+* `MYTEMPLATE_SOURCE_DIR`:
+    * There are two directories in the python flask application root
+    directory, `templates` and `templates2`.  Each directory contain
+    a single file `index.html`.  They will be used to demonstrate
+    displaying different image files.
+
+---
 
 Patch the `ocp4-exp01-web` `configmap` to reconfigure flask to display
 a different index.html file.  The `templates2` directory contains an `index.html`
-file that is configured to display a different image.
+file which is configured to display a different image.
 
 ```bash
 oc patch configmap ocp4-exp01-web \
@@ -319,7 +342,7 @@ oc patch sts pythonflask \
 --patch "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"rollme\":\"$ROLLME\"}}}}}"
 ```
 
-Make sure the last rollout is complete by checking that all pods are running
+* Make sure the last rollout is complete by checking that all pods are running
 
 ```bash
 oc get pods
@@ -333,15 +356,15 @@ pythonflask-0   1/1     Running   0          82s
 pythonflask-1   1/1     Running   0          58s
 ```
 
-Browse the route
+* Browse the route (or refresh the browser)
 
 ```bash
 firefox --private-window $WEB_ADDR &
 ```
 
-* Web page will display one working and one broken picture and display the word "templates2"
+Web page will display one working and one broken picture and display the word "templates2"
 
-* "Space Cat" image is in the `/usr/share/html` directory -- switch the
+"Space Cat" image is in the `/usr/share/html` directory -- switch the
 directory source for static files and reload.
 
 ---
@@ -434,3 +457,4 @@ from its own container into the Persistent Volume.
 ```bash
 firefox --private-window $WEB_ADDR &
 ```
+# END OF DEMONSTRATION
