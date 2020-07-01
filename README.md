@@ -1,9 +1,10 @@
 # ocp4-exp01-initcont
-OCP4 initcontainer experiment
+
+OpenShift 4 "initContainer" experiment
 
 ## Use-Case
 
-CHANGEME
+CHANGE-ME
 
 ## Design
 
@@ -17,7 +18,7 @@ CHANGME
     * Not public
   * IAM User
     * Read Write to S3 Bucket
-      * Inline Policy    
+      * Inline Policy
   * IAM User
     * Read Only to S3 Bucket
       * Inline Policy
@@ -26,34 +27,36 @@ CHANGME
     * Account
     * Two image repositories
 * OpenShift 4 cluster
+  * Persistent Volume capability
+    * RWO
 
 ## PREPARATION
 
 ### Create S3 Bucket
 
-CHANGEME
+CHANGE-ME
 
 ### Create AWS IAM Users and attach policy
 
-CHANGEME
+CHANGE-ME
 
 ### Push images into S3 bucket
 
-CHANGEME
+CHANGE-ME
 
 ### Create Quay.io repositories
 
-CHANGEME
+CHANGE-ME
 
 ### Build and Push container images
 
-CHANGEME
+CHANGE-ME
 
 ### Deploy application
 
 Set environment variables
 
-```
+```bash
 export INITCONTPROJECT=ocp4-exp01-initcont
 
 export AWS_ACCESS_KEY_ID=your-key-id
@@ -66,13 +69,13 @@ export S3FOLDER=your-s3-folder-name
 
 Create a new project
 
-```
+```bash
 oc new-project $INITCONTPROJECT
 ```
 
 Create deployment
 
-```
+```bash
 deployment/create_secret.sh
 oc apply -n $INITCONTPROJECT -f deployment/configmap.yaml
 oc apply -n $INITCONTPROJECT -f deployment/service.yaml
@@ -82,32 +85,32 @@ oc apply -n $INITCONTPROJECT -f deployment/statefulset.yaml
 
 Get the route
 
-```
+```bash
 oc get route ocp4-exp01-web
 ```
 
 OUTPUT (an example)
 
-```
+```bash
 NAME             HOST/PORT                                                                           PATH   SERVICES         PORT   TERMINATION   WILDCARD
 ocp4-exp01-web   ocp4-exp01-web-ocp4-exp01-initcont.apps.cluster-0a62.0a62.sandbox1775.opentlc.com          ocp4-exp01-web   8080                 None
 ```
 
-Browse the route with firefox
+Browse the route with a browser (example is using Firefox)
 
-```
+```bash
 export WEB_ADDR=http://$(oc get route ocp4-exp01-web -n $INITCONTPROJECT -o jsonpath='{.spec.host}')
 
 firefox --private-window $WEB_ADDR &
 ```
 
-Inital web page will have one image that works, the other is broken (because the file does not exist).
-
+The web page will have one image that works, the other is broken (because the file does not exist).
 
 ### Begin experiment/demonstration of switching web templates and static image sources
 
 Possible combinations of settings for python flask for this experiment:
-```
+
+```bash
 #######################################################################
 
 # MYDATA_SOURCE_DIR: static
@@ -119,18 +122,19 @@ Possible combinations of settings for python flask for this experiment:
 #######################################################################
 ```
 
-Patch the ocp4-exp01-web configmap so flask will be configured display another
-index.html file.  The templates2 directory contains index.html configured
-to display a different image.
+Patch the `ocp4-exp01-web` `configmap` to reconfigure flask to display
+a different index.html file.  The `templates2` directory contains an `index.html`
+file that is configured to display a different image.
 
-```
+```bash
 oc patch configmap ocp4-exp01-web \
 -n $INITCONTPROJECT \
 --patch '{"data":{"MYTEMPLATE_SOURCE_DIR":"templates2"}}'
 ```
 
-Force statefullset to redeploy
-```
+Force `statefullset` to redeploy
+
+```bash
 ROLLME=`date +%N` ; echo $ROLLME ; \ \
 oc patch sts pythonflask \
 -n $INITCONTPROJECT \
@@ -139,57 +143,66 @@ oc patch sts pythonflask \
 
 Make sure the last rollout is complete by checking that all pods are running
 
-```
+```bash
 oc get pods
 ```
 
 OUTPUT
-```
+
+```bash
 NAME            READY   STATUS    RESTARTS   AGE
 pythonflask-0   1/1     Running   0          82s
 pythonflask-1   1/1     Running   0          58s
 ```
 
 Browse the route
-```
+
+```bash
 firefox --private-window $WEB_ADDR &
 ```
 
-* Web page will display one working and one broken picture and say "templates2"
+* Web page will display one working and one broken picture and display the word "templates2"
 
-* "Space Cat" image is in the /usr/share/html directory -- we need to switch the
+* "Space Cat" image is in the `/usr/share/html` directory -- switch the
 directory source for static files and reload.
 
 ---
 
-Change the configmap to pull from container's /usr/share/html directory
-```
+Change the `configmap` configuration for the web container forcing flask to
+pull static images from `/usr/share/html`
+
+```bash
 oc patch configmap ocp4-exp01-web \
 -n $INITCONTPROJECT \
 --patch '{"data":{"MYDATA_SOURCE_DIR":"/usr/share/html"}}'
 ```
 
-Force statefullset to redeploy
-```
+Force `statefullset` to redeploy
+
+```bash
 ROLLME=`date +%N`; echo $ROLLME ; \
 oc patch sts pythonflask \
 -n $INITCONTPROJECT \
 --patch "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"rollme\":\"$ROLLME\"}}}}}"
 ```
 
-Make sure the last rollout is complete by checking that all pods are running
-```
+Make sure the last rollout is complete (before reloading/deploying the browser) by checking that all pods are running
+
+```bash
 oc get pods
 ```
+
 OUTPUT
-```
+
+```bash
 NAME            READY   STATUS    RESTARTS   AGE
 pythonflask-0   1/1     Running   0          82s
 pythonflask-1   1/1     Running   0          58s
 ```
 
 Browse the route
-```
+
+```bash
 firefox --private-window $WEB_ADDR &
 ```
 
@@ -199,15 +212,17 @@ Page will show two pictures
 
 Enable the S3BUCKET
 
-Change the configmap for ocp4-exp01-web:
-```
+Alter the `configmap` for ocp4-exp01-web
+
+```bash
 oc patch configmap ocp4-exp01-initcont \
 -n $INITCONTPROJECT \
 --patch '{"data":{"S3BUCKET":"true"}}'
 ```
 
-Force statefullset to redeploy:
-```
+Force `statefullset` to redeploy
+
+```bash
 ROLLME=`date +%N` ; echo $ROLLME ; \
 oc patch sts pythonflask \
 -n $INITCONTPROJECT \
@@ -218,7 +233,8 @@ Reload the image -- I found that I needed to view the web page in a new browser 
 the browser cached the initial space_cat.png image without displaying the new, much larger image.
 
 * The browser 'should' display the much larger image
-```
+  
+```bash
 firefox --private-window $WEB_ADDR &
 ```
 
@@ -226,23 +242,26 @@ firefox --private-window $WEB_ADDR &
 
 Switch back to the smaller space_cat.png image
 
-Change the configmap for ocp4-exp01-web:
-```
+Change the `configmap` for ocp4-exp01-web:
+
+```bash
 oc patch configmap ocp4-exp01-initcont \
 -n $INITCONTPROJECT \
 --patch '{"data":{"S3BUCKET":"false"}}'
 ```
 
-Force statefullset to redeploy
-```
+Force `statefullset` to redeploy
+
+```bash
 ROLLME=`date +%N` ; echo $ROLLME ; \
 oc patch sts pythonflask \
 -n $INITCONTPROJECT \
 --patch "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"rollme\":\"$ROLLME\"}}}}}"
 ```
 
-Demonstrate that the initcontainer has copied the image from the initcontainer's directory.
+Because you changed the `S3BUCKET` variable to false, the initContainer will copy its images
+from its own container into the Persistent Volume.
 
-```
+```bash
 firefox --private-window $WEB_ADDR &
 ```
