@@ -257,6 +257,16 @@ export INITCONTPROJECT=ocp4-exp01-initcont
 oc new-project $INITCONTPROJECT
 ```
 
+* Alter the statefulset
+
+The statefulset contains two image attributes, one in the 
+`initContainers` and the other in `containers`.  Change each
+one to match your registry, username, repository and tag.
+
+```bash
+vi deployment/statefulset.yaml
+```
+
 * Deploy the application
 
 ```bash
