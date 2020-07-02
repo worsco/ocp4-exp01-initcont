@@ -469,4 +469,9 @@ from its own container into the Persistent Volume.
 ```bash
 firefox --private-window $WEB_ADDR &
 ```
+## TODO
+
+* Add Readiness & Liveliness
+* Add Requests & Limits
+
 # END OF DEMONSTRATION
