@@ -18,6 +18,11 @@ spec:
       initContainers:
         - name: initpv
           image: 'quay.io/worsco/ocp4-exp01-initcont:latest'
+          resources:
+            requests:
+              memory: 96Mi
+            limits:
+              memory: 256Mi
           env:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
@@ -56,6 +61,11 @@ spec:
       containers:
         - name: pythonflask
           image: 'quay.io/worsco/ocp4-exp01-web:latest'
+          resources:
+              requests:
+                memory: 144Mi
+              limits:
+                memory: 256Mi
           env:
             - name: MYDATA_SOURCE_DIR
               valueFrom:
